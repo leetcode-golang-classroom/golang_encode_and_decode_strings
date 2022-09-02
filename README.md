@@ -46,7 +46,23 @@ One possible encode method is: "we:;say:;:::;yes"
 
 然而如果用單一個字元做分隔符怕會出現分隔符剛好是某個字串的字
 
-所以需要使用兩個字元當作分隔符號比如 “:;”
+![](https://i.imgur.com/DwCrVTR.png)
+
+這樣就會導致錯誤切分字串
+
+要避免切割錯誤的字元數目其實只要代切割字元之前加入字串長度的訊息
+
+如下圖：
+![](https://i.imgur.com/CcSMYy6.png)
+
+而 Decode 時同樣先從 第一個 ‘#’ 前的數字讀取出字串長度，然後再從第一個 ‘#’ 的下一個字元開始蒐集字串
+
+如下圖:
+![](https://i.imgur.com/RNo8yf3.png)
+
+具體作法如下：
+
+![](https://i.imgur.com/ZKbGHGx.png)
 
 這樣每次encode 跟 decode 都需要走訪整個串列 所以時間複雜度是 O(n)
 
@@ -54,7 +70,10 @@ One possible encode method is: "we:;say:;:::;yes"
 ```go
 package sol
 
-import "strings"
+import (
+	"fmt"
+	"strconv"
+)
 
 type ListHandle struct {
 	sep string
@@ -66,12 +85,33 @@ func Constructor(sep string) ListHandle {
 	}
 }
 func (h *ListHandle) encode(list []string) string {
-	return strings.Join(list, h.sep)
+	encodeString := ""
+	for _, val := range list {
+		encodeString += fmt.Sprintf("%d%s%s", len(val), h.sep, val)
+	}
+	return encodeString
 }
 
 func (h *ListHandle) decode(str string) []string {
-	return strings.Split(str, h.sep)
+	decodeResult := []string{}
+	pos := 0
+	strLen := len(str)
+	tempLen := ""
+	for pos < strLen {
+		if string(str[pos]) != h.sep {
+			tempLen += string(str[pos])
+		} else { // first meet #
+			num, _ := strconv.Atoi(tempLen)
+			decodeResult = append(decodeResult, str[pos+1:pos+num+1])
+			tempLen = ""
+			pos += num + 1
+			continue
+		}
+		pos++
+	}
+	return decodeResult
 }
+
 ```
 ## 困難點
 
@@ -79,6 +119,5 @@ func (h *ListHandle) decode(str string) []string {
 2. 需要注意到單一字元可能會成為字串的一部份
 
 ## Solve Point
-
-- [x]  實作 encode : 把輸入字串陣列以 ‘:;’ 做 join 產生新字串
-- [x]  實作 decode: 把輸入字串以 ‘:;’ 做 split 回傳字串陣列
+- [x]  實作 encode : 把輸入字串陣列以 字串長度+分隔符號+字串來做編碼
+- [x]  實作 decode: 把輸入字串先找出’#’ 字元以其之前的字串作為字串長度做分割
