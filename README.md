@@ -62,7 +62,7 @@ One possible encode method is: "we:;say:;:::;yes"
 
 具體作法如下：
 
-![](https://i.imgur.com/ZKbGHGx.png)
+![](https://i.imgur.com/rvS3Pmg.png)
 
 這樣每次encode 跟 decode 都需要走訪整個串列 所以時間複雜度是 O(n)
 
@@ -120,4 +120,4 @@ func (h *ListHandle) decode(str string) []string {
 
 ## Solve Point
 - [x]  實作 encode : 把輸入字串陣列以 字串長度+分隔符號+字串來做編碼
-- [x]  實作 decode: 把輸入字串先找出’#’ 字元以其之前的字串作為字串長度做分割
+- [x]  實作 decode: 把輸入字串先找出分隔符號以其之前的字串作為字串長度做分割
